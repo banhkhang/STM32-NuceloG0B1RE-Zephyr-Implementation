@@ -1,0 +1,8 @@
+build/
+.vscode/
+
+*.elf
+*.hex
+*.bin
+*.map
+*.stat

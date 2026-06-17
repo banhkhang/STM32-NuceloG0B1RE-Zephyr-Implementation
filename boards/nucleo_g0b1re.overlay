@@ -1,0 +1,7 @@
+
+/{
+    aliases{
+        led0 = &green_led_1;
+        btn0 = &user_button;
+    };  
+};
