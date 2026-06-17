@@ -11,13 +11,15 @@ LOG_MODULE_REGISTER(thread_mng);
 
 /* pin configuration */
 #define LED_NODE DT_ALIAS(led0)
-#define BTN_NODE DT_ALIAS(btn0)
+#define BTN_NODE DT_ALIAS(sw0)
 
 static const struct gpio_dt_spec led0 = 
 	GPIO_DT_SPEC_GET(LED_NODE, gpios);
 
-static const struct gpio_dt_spec btn0 = 
+static const struct gpio_dt_spec sw0 = 
 	GPIO_DT_SPEC_GET(BTN_NODE, gpios);
+
+static int conf_return;
 
 
 /* prototype functions */
@@ -37,7 +39,7 @@ void button_pressed_isr(const struct device *dev, struct gpio_callback *cb, uint
 
 /* Thread def*/
 	/* Thread A */
-K_THREAD_STACK_DEFINE(thread_stack_a, 512);
+K_THREAD_STACK_DEFINE(thread_stack_a, 1024);
 struct k_thread thread_data_a;
 void thread_a(void *arg1, void *arg2, void *arg3){
 	while (1)
@@ -48,7 +50,7 @@ void thread_a(void *arg1, void *arg2, void *arg3){
 }
 
 	/* Thread B */
-K_THREAD_STACK_DEFINE(thread_stack_b, 512);
+K_THREAD_STACK_DEFINE(thread_stack_b, 1024);
 struct k_thread thread_data_b;
 void thread_b(void *arg1, void *arg2, void *arg3){
 	while (1)
@@ -79,14 +81,25 @@ static struct gpio_callback button_cb_data;		//create callback object as a regis
 
 void pin_config(void){
 	/* Pin configuration code can be added here if needed */
-	gpio_pin_configure_dt(&led0, GPIO_OUTPUT_ACTIVE);
-	gpio_pin_configure_dt(&btn0, GPIO_INPUT);
+	if(!gpio_is_ready_dt(&led0)){
+		LOG_ERR("LED device not ready");
+		return;
+	}
+
+	conf_return = gpio_pin_configure_dt(&led0, GPIO_OUTPUT_ACTIVE);
+	LOG_INF("led config ret=%d", conf_return);
+
+	if(!gpio_is_ready_dt(&sw0)){
+		LOG_ERR("Switch device not ready");
+		return;
+	}
+	
+	conf_return = gpio_pin_configure_dt(&sw0, GPIO_INPUT);
+	LOG_INF("sw config ret=%d", conf_return);
 
 	/* Interrupt configuration code can be added here if needed */
-	gpio_pin_interrupt_configure_dt(
-    &btn0,
-    GPIO_INT_EDGE_TO_ACTIVE);
-
+	conf_return = gpio_pin_interrupt_configure_dt(&sw0, GPIO_INT_EDGE_TO_ACTIVE);
+	LOG_INF("sw interrupt config ret=%d", conf_return);
 }
 
 void sys_init(void){
@@ -95,10 +108,10 @@ void sys_init(void){
 	gpio_init_callback(
     &button_cb_data,		//button_cb_data.callback = button_pressed_isr
     button_pressed_isr,
-    BIT(btn0.pin));			//button_cb_data.pin_mask = BIT(btn0.pin)
+    BIT(sw0.pin));			//button_cb_data.pin_mask = BIT(sw0.pin)
 
 	gpio_add_callback(		//When GPIOA/GPIOB/GPIOC interrupt happens, look inside button_cb_data.
-    btn0.port,
+    sw0.port,
     &button_cb_data);
 }
 

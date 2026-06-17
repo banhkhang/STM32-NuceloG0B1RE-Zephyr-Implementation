@@ -26,7 +26,7 @@ int main(void)
 
     while (1)
     {
-        LOG_INF("Init: %d\n", count);
+        LOG_INF("Init: %d", count);
         k_sleep(K_FOREVER);
     }
 }
