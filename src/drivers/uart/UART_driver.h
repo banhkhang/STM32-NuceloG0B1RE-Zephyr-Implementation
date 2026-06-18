@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// A function pointer template for UART
 typedef void (*uart_rx_byte_cb_t)(uint8_t byte);
 
 bool UART_DriverInit(void);

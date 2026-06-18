@@ -4,6 +4,7 @@
 
 #include <zephyr/drivers/gpio.h>
 
+// Function pointer - template for interrupt function
 typedef void (*button_callback_t)(const struct device *dev,
     struct gpio_callback *cb, uint32_t pins);
 

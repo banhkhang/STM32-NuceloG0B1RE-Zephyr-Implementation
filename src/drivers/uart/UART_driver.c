@@ -1,3 +1,4 @@
+/* UART_driver.c */
 #include <zephyr/drivers/uart.h>
 #include <zephyr/device.h>
 #include <zephyr/logging/log.h>

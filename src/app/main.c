@@ -6,11 +6,11 @@
 #include <zephyr/drivers/gpio.h>
 
 #include "ThreadMng.h"
+#include "GPIO_driver.h"
 
 LOG_MODULE_REGISTER(main);
 
 /* LED Configuration */
-
 
 int main(void)
 {
