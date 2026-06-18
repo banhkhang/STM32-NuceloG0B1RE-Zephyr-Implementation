@@ -41,7 +41,7 @@ void pin_config(void){
 
 /* The driver only wires the ISR into the GPIO controller.
    It has no idea what the callback DOES — that's the service's job. */
-void GPIO_RegisterButtonCallback(button_callback_t cb)
+void GPIO_RegisterButtonCallback(button_callback_t cb)	//
 {
     gpio_init_callback(&button_cb_data, cb, BIT(sw0.pin));
     gpio_add_callback(sw0.port, &button_cb_data);

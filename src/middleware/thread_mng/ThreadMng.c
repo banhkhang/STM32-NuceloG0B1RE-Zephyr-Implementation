@@ -26,7 +26,7 @@ void thread_a(void *arg1, void *arg2, void *arg3){
 	while (1)
 	{
 		LOG_INF("Thread A is running");
-		UART_SendString("Hello\r\n");
+		UART_SendString("Hello\n");
 		k_sleep(K_SECONDS(2));
 	}
 }
