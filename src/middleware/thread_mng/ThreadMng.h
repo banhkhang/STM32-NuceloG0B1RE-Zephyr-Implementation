@@ -3,8 +3,7 @@
 
 #include <stdint.h>
 
-/* extern variables*/
-extern volatile uint8_t count;
+#include "UART_service.h"
 
 /* init prototypes*/
 void thread_init(void);
