@@ -2,6 +2,14 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
+#Name the project
+project(
+    nucleo_g0b1re_Zephyr_implementation
+    VERSION 1.0
+    DESCRIPTION "Zephyr implementation for Nucleo G0B1RE"
+    LANGUAGES C
+    )
+
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(nucleo_g0b1re)
 

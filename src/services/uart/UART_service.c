@@ -47,6 +47,7 @@ void UART_ServiceInit(void)
         return;
     }
 
+    //  uart_rx_byte_handler (service) now equals rx_callback (driver)
     UART_DriverRegisterRxCallback(uart_rx_byte_handler);
 
     k_thread_create(&uart_rx_thread_data, uart_rx_thread_stack,
@@ -55,7 +56,8 @@ void UART_ServiceInit(void)
                      UART_RX_THREAD_PRIORITY, 0, K_NO_WAIT);
 }
 
-void UART_SendString(char *msg)
+// Public APIs
+void UART_ServiceSend(char *msg)
 {
     UART_DriverSend((const uint8_t *)msg, strlen(msg));
 }

@@ -1,4 +1,5 @@
 /* UART_driver.c */
+/* 1. Includes and Configuration Definitions */
 #include <zephyr/drivers/uart.h>
 #include <zephyr/device.h>
 #include <zephyr/logging/log.h>
@@ -7,16 +8,20 @@
 
 LOG_MODULE_REGISTER(uart_driver);
 
+/* 2. Private (Static) Driver Variables */
 static const struct device *uart_dev;
-static uart_rx_byte_cb_t rx_callback;
+static uart_rx_byte_cb_t rx_callback;   // pointer to the service layer
 
+/* 3. The Interrupt Service Routine (ISR) */
 static void uart_isr(const struct device *dev, void *user_data)
 {
     uint8_t byte;
-
+    // Refresh int stat and Check if theres any unhandled interrupt 
     while (uart_irq_update(dev) && uart_irq_is_pending(dev)) {
+        // Check if physical it is RX data and is ready
         if (uart_irq_rx_ready(dev)) {
             while (uart_fifo_read(dev, &byte, 1) == 1) {
+                // Read byte out of hardware FIFO and trigger callback
                 if (rx_callback) {
                     rx_callback(byte);
                 }
@@ -25,6 +30,7 @@ static void uart_isr(const struct device *dev, void *user_data)
     }
 }
 
+/* 4. Public API Implementation Functions */
 bool UART_DriverInit(void)
 {
     uart_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
@@ -34,7 +40,9 @@ bool UART_DriverInit(void)
         return false;
     }
 
+    //register uart_isr as real ISR
     uart_irq_callback_user_data_set(uart_dev, uart_isr, NULL);
+    //enable RX interrupt 
     uart_irq_rx_enable(uart_dev);
 
     return true;

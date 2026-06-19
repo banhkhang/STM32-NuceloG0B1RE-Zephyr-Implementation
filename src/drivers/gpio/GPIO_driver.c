@@ -44,7 +44,13 @@ void pin_config(void){
 void GPIO_RegisterButtonCallback(button_callback_t cb)	//
 {
     gpio_init_callback(&button_cb_data, cb, BIT(sw0.pin));
+	/*
+	button_cb_data: fills it with cb
+	cb: which function to call
+	BIT(sw0.pin): which pin this callback cares about)
+	*/ 
     gpio_add_callback(sw0.port, &button_cb_data);
+	/* register that callback structure with real port*/
 }
 
 void GPIO_ToggleLED(void)

@@ -25,8 +25,8 @@ struct k_thread thread_data_b;
 void thread_a(void *arg1, void *arg2, void *arg3){
 	while (1)
 	{
-		LOG_INF("Thread A is running");
-		UART_SendString("Hello\n");
+		UART_ServiceSend("Thread A is running");
+		UART_ServiceSend("Hello\n");
 		k_sleep(K_SECONDS(2));
 	}
 }

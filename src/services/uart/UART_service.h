@@ -4,6 +4,6 @@
 
 void UART_ServiceInit(void);
 
-void UART_SendString(char *msg);
+void UART_ServiceSend(char *msg);
 
 #endif
