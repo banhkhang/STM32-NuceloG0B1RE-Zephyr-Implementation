@@ -18,10 +18,13 @@ RING_BUF_DECLARE(rx_ringbuf, UART_RX_RINGBUF_SIZE);
 K_THREAD_STACK_DEFINE(uart_rx_thread_stack, UART_RX_THREAD_STACK_SIZE);
 static struct k_thread uart_rx_thread_data;
 
+K_SEM_DEFINE(uart_rx_sem, 0, 1);
+
 static void uart_rx_byte_handler(uint8_t byte)
 {
     /* Called from ISR context - keep this trivial */
     ring_buf_put(&rx_ringbuf, &byte, 1);
+    k_sem_give(&uart_rx_sem);
 }
 
 static void uart_rx_thread(void *a1, void *a2, void *a3)
@@ -29,13 +32,15 @@ static void uart_rx_thread(void *a1, void *a2, void *a3)
     uint8_t byte;
 
     while (1) {
-        if (ring_buf_get(&rx_ringbuf, &byte, 1) == 1) {
+        k_sem_take(&uart_rx_sem, K_FOREVER);
+        while (ring_buf_get(&rx_ringbuf, &byte, 1) == 1) {
             /* Echo behavior for now - this is the seam where
                command parsing / framing logic will go later */
             UART_DriverSend(&byte, 1);
-        } else {
-            k_sleep(K_MSEC(5));
-            //replace with semaphore 
+            if(byte == '\r'){
+                static const uint8_t newline = '\n';
+                UART_DriverSend(&newline, 1);
+            }
         }
     }
 }

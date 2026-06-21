@@ -13,6 +13,7 @@ static const struct device *uart_dev;
 static uart_rx_byte_cb_t rx_callback;   // pointer to the service layer
 
 /* 3. The Interrupt Service Routine (ISR) */
+//When theres byte on RX pin, byte copied FIFO reg, isr do following
 static void uart_isr(const struct device *dev, void *user_data)
 {
     uint8_t byte;
