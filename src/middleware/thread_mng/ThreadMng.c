@@ -21,17 +21,17 @@ struct k_thread thread_data_a;
 K_THREAD_STACK_DEFINE(thread_stack_b, THREAD_B_STACK_SIZE);
 struct k_thread thread_data_b;
 
-/* Thread A */
+/* Thread A - UART Thread */
 void thread_a(void *arg1, void *arg2, void *arg3){
 	while (1)
 	{
 		UART_ServiceSend("Thread A is running\r\n");
 		UART_ServiceSend("Hello\r\n\r\n");
-		k_sleep(K_SECONDS(2));
+		k_sleep(K_FOREVER);
 	}
 }
 
-/* Thread B */
+/* Thread B - Button Thread */
 void thread_b(void *arg1, void *arg2, void *arg3){
 	while (1)
 	{

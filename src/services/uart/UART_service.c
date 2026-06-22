@@ -27,6 +27,8 @@ static void uart_rx_byte_handler(uint8_t byte)
     k_sem_give(&uart_rx_sem);
 }
 
+static uint8_t rx_buffer[UART_RX_BUFFER_SIZE];
+static uint8_t index = 0;
 static void uart_rx_thread(void *a1, void *a2, void *a3)
 {
     uint8_t byte;
@@ -36,10 +38,25 @@ static void uart_rx_thread(void *a1, void *a2, void *a3)
         while (ring_buf_get(&rx_ringbuf, &byte, 1) == 1) {
             /* Echo behavior for now - this is the seam where
                command parsing / framing logic will go later */
-            UART_DriverSend(&byte, 1);
+            UART_DriverSend_IT(&byte, 1);
+            rx_buffer[index] = byte;
             if(byte == '\r'){
                 static const uint8_t newline = '\n';
-                UART_DriverSend(&newline, 1);
+                rx_buffer[++index] = newline;   //end of buf should be ...\r\n
+                UART_DriverSend_IT(&rx_buffer[index], 1);   //should print '\n'
+
+                rx_buffer[++index] = '\0';      //end of buffer should be
+                UART_DriverSend_IT(rx_buffer, strlen(rx_buffer));// should print whole line
+                //then automatically jump to next line
+                
+                index = 0;
+            }
+            else if(byte == '\b'){
+                if (index > 0) index--;
+                else index = 0;
+            }
+            else{
+                index++;
             }
         }
     }
@@ -66,3 +83,8 @@ void UART_ServiceSend(char *msg)
 {
     UART_DriverSend((const uint8_t *)msg, strlen(msg));
 }
+
+void UART_ServiceSend_IT(char *msg){
+    UART_DriverSend_IT((const uint8_t *)msg, strlen(msg));
+}
+
